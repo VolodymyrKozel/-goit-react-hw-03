@@ -1,21 +1,31 @@
-import './App.css';
+import css from './App.module.css';
+import contactsData from './db';
 import ContactForm from './components/contactform/ContactForm';
 import ContactList from './components/contactlist/ContactList';
-
+import SearchBox from './components/searchbox/SearchBox';
+import { useEffect, useState } from 'react';
 function App() {
-  const contactsData = [
-    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-  ];
 
+  const [contacts, setContacts] = useState(JSON.parse(localStorage.getItem('contacts')) || []);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+      localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+  
+   const handleDelete = (id) => {
+    const filteredContacts = contacts.filter((item) => item.id !== id);
+    setContacts(filteredContacts);
+  }
   return (
-    <div>
-      <h1>Phonebook</h1>
-      <ContactForm />
-      {/* <SearchBox /> */}
-      <ContactList contactsData={contactsData} />
+    <div className={css['container']}>
+      <h1 className={css['app-title']}>Phonebook</h1>
+      <ContactForm contacts={contacts} setContacts={setContacts} />
+      <SearchBox search={search} setSearch={setSearch}  />
+      <ContactList
+        handleDelete={handleDelete}
+        contactsData={contacts.filter(({ name }) => name.toLowerCase().includes(search.toLowerCase()))}
+      />
     </div>
   );
 }
